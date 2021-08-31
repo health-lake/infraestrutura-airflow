@@ -1,7 +1,10 @@
 image: 
   ubuntu:20.04
 
-on: push
+on:
+  pull_requests:
+    branches:
+      - main
 
 before_script:
   - apt update
@@ -33,3 +36,7 @@ deploy:
   when: always
   only:
     - main
+
+jobs:
+  - before_script
+  - deploy
