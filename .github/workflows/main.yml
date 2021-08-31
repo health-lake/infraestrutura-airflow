@@ -30,4 +30,4 @@ deploy:
     - ssh -o StrictHostKeyChecking=no ubuntu@${HOST} 'bash -s' < run.sh
   when: always
   only:
-    - master
+    - main
