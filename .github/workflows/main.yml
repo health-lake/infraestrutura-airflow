@@ -6,13 +6,11 @@ on:
       - main
 
 jobs:
-  build:
-
+  deploy:
     runs-on: ubuntu:20.04
-
     steps:
-      - uses: actions/checkout@v1
-      - name: before_script
+    - uses: actions/checkout@v1
+    - name: before_script
       run: |
         apt update
         apt install gettext-base
