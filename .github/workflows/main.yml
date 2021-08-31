@@ -1,42 +1,34 @@
-image: 
-  ubuntu:20.04
+name: develop
 
 on:
-  pull_requests:
+  push:
     branches:
       - main
 
-before_script:
-  - apt update
-  - apt install gettext-base
-  - 'command -v ssh-agent >/dev/null || ( apt-get update -y && apt-get install openssh-client -y )'
-  - eval $(ssh-agent -s)
-  - echo "$AIRFLOW_PEM" | tr -d '\r' | ssh-add -
-  - mkdir -p ~/.ssh
-  - chmod 700 ~/.ssh
-
-variables:
-  AIRFLOW_PEM: ${AIRFLOW_PEM}
-  POSTGRESQL_DATABASE: ${POSTGRESQL_DATABASE_DEV}
-  POSTGRESQL_USERNAME: ${POSTGRESQL_DATABASE_DEV}
-  POSTGRESQL_PASSWORD: ${POSTGRESQL_PASSWORD_DEV}
-  AIRFLOW_PASSWORD: ${AIRFLOW_PASSWORD}
-  AIRFLOW_USERNAME: ${AIRFLOW_USERNAME}
-  AIRFLOW_EMAIL: ${AIRFLOW_EMAIL}
-
-stages:
-  - deploy
-
-deploy:
-  stage: deploy
-  script:
-    - envsubst < docker-compose.yaml > docker-compose.yml
-    - scp -o StrictHostKeyChecking=no docker-compose.yml ubuntu@${HOST}:docker-compose.yaml
-    - ssh -o StrictHostKeyChecking=no ubuntu@${HOST} 'bash -s' < run.sh
-  when: always
-  only:
-    - main
-
 jobs:
-  - before_script
-  - deploy
+  build:
+
+    runs-on: ubuntu:20.04
+
+    steps:
+      - uses: actions/checkout@v1
+      - name: before_script
+      run: |
+        apt update
+        apt install gettext-base
+        'command -v ssh-agent >/dev/null || ( apt-get update -y && apt-get install openssh-client -y )'
+        eval $(ssh-agent -s)
+        echo "$AIRFLOW_PEM" | tr -d '\r' | ssh-add -
+        mkdir -p ~/.ssh
+        chmod 700 ~/.ssh
+        envsubst < docker-compose.yaml > docker-compose.yml
+        scp -o StrictHostKeyChecking=no docker-compose.yml ubuntu@${HOST}:docker-compose.yaml
+        ssh -o StrictHostKeyChecking=no ubuntu@${HOST} 'bash -s' < run.sh
+      env:
+        AIRFLOW_PEM: ${{ secrets.AIRFLOW_PEM }}
+        POSTGRESQL_DATABASE: ${{ secrets.POSTGRESQL_DATABASE_DEV }}
+        POSTGRESQL_USERNAME: ${{ secrets.POSTGRESQL_DATABASE_DEV }}
+        POSTGRESQL_PASSWORD: ${{ secrets.POSTGRESQL_PASSWORD_DEV }}
+        AIRFLOW_PASSWORD: ${{ secrets.AIRFLOW_PASSWORD }}
+        AIRFLOW_USERNAME: ${{ secrets.AIRFLOW_USERNAME }}
+        AIRFLOW_EMAIL: ${{ secrets.AIRFLOW_EMAIL }}
