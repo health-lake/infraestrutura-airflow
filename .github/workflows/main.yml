@@ -1,6 +1,8 @@
 image: 
   ubuntu:20.04
 
+on: push
+
 before_script:
   - apt update
   - apt install gettext-base
