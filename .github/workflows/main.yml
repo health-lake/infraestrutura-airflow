@@ -12,8 +12,8 @@ jobs:
     - uses: actions/checkout@v1
     - name: before_script
       run: |
-        sudo apt update
-        sudo apt install gettext-base
+        apt-get update
+        apt-get install gettext-base
         'command -v ssh-agent >/dev/null || ( apt-get update -y && apt-get install openssh-client -y )'
         eval $(ssh-agent -s)
         echo "$AIRFLOW_PEM" | tr -d '\r' | ssh-add -
