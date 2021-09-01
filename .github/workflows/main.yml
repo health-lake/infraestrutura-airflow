@@ -10,6 +10,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v1
+      env:
+          AIRFLOW_PEM: ${{ secrets.AIRFLOW_PEM }}
+          POSTGRESQL_DATABASE: ${{ secrets.POSTGRESQL_DATABASE_DEV }}
+          POSTGRESQL_USERNAME: ${{ secrets.POSTGRESQL_DATABASE_DEV }}
+          POSTGRESQL_PASSWORD: ${{ secrets.POSTGRESQL_PASSWORD_DEV }}
+          AIRFLOW_PASSWORD: ${{ secrets.AIRFLOW_PASSWORD }}
+          AIRFLOW_USERNAME: ${{ secrets.AIRFLOW_USERNAME }}
+          AIRFLOW_EMAIL: ${{ secrets.AIRFLOW_EMAIL }}
     - name: before_script
       run: |
         sudo apt-get update
@@ -20,6 +28,7 @@ jobs:
         chmod 700 ~/.ssh
         envsubst < docker-compose.yaml > docker-compose.yml
         scp -o StrictHostKeyChecking=no docker-compose.yml ubuntu@${{ secrets.HOST }}:docker-compose.yaml
+        ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.HOST }} 'bash -s' < run.sh
       env:
         AIRFLOW_PEM: ${{ secrets.AIRFLOW_PEM }}
         POSTGRESQL_DATABASE: ${{ secrets.POSTGRESQL_DATABASE_DEV }}
