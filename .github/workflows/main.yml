@@ -14,15 +14,13 @@ jobs:
       run: |
         sudo apt-get update
         sudo apt-get install gettext-base
-        ssh -o StrictHostKeyChecking=no ubuntu@3.234.223.183 'ls'
-        'command -v ssh-agent >/dev/null || ( apt-get update -y && apt-get install openssh-client -y )'
         eval $(ssh-agent -s)
         echo "$AIRFLOW_PEM" | tr -d '\r' | ssh-add -
         mkdir -p ~/.ssh
         chmod 700 ~/.ssh
         envsubst < docker-compose.yaml > docker-compose.yml
-        scp -o StrictHostKeyChecking=no docker-compose.yml ubuntu@${HOST}:docker-compose.yaml
-        ssh -o StrictHostKeyChecking=no ubuntu@${HOST} 'bash -s' < run.sh
+        scp -o StrictHostKeyChecking=no docker-compose.yml ubuntu@${{ secrets.HOST }}:docker-compose.yaml
+        ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.HOST }} 'bash -s' < run.sh
       env:
         AIRFLOW_PEM: ${{ secrets.AIRFLOW_PEM }}
         POSTGRESQL_DATABASE: ${{ secrets.POSTGRESQL_DATABASE_DEV }}
