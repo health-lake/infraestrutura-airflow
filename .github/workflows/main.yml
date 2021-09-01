@@ -23,7 +23,7 @@ jobs:
         sudo apt-get update
         sudo apt-get install gettext-base
         eval $(ssh-agent -s)
-        echo "$AIRFLOW_PEM" | tr -d '\r' | ssh-add -
+        echo "${{ AIRFLOW_PEM }}" | tr -d '\r' | ssh-add -
         mkdir -p ~/.ssh
         chmod 700 ~/.ssh
         envsubst < docker-compose.yaml > docker-compose.yml
