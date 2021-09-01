@@ -14,7 +14,7 @@ jobs:
       run: |
         sudo apt-get update
         sudo apt-get install gettext-base
-        ssh -o StrictHostKeyChecking=no ubuntu@${HOST} 'ls'
+        ssh -o StrictHostKeyChecking=no ubuntu@3.234.223.183 'ls'
         'command -v ssh-agent >/dev/null || ( apt-get update -y && apt-get install openssh-client -y )'
         eval $(ssh-agent -s)
         echo "$AIRFLOW_PEM" | tr -d '\r' | ssh-add -
