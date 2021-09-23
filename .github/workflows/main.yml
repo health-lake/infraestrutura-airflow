@@ -22,8 +22,8 @@ jobs:
         username: ubuntu
         key: ${{ secrets.AIRFLOW_PEM }}
         port: 22
-        source: "docker-compose.yaml,run.sh"
-        target: "docker-compose.yml,run.sh"
+        source: "docker-compose.yaml,run.sh,config/*"
+        target: "files"
       # with:
       #   host: ${{ secrets.HOST }}
       #   username: ${{ secrets.USERNAME }}
@@ -31,6 +31,24 @@ jobs:
       #   port: ${{ secrets.PORT }}
       #   source: "tests/a.txt,tests/b.txt"
       #   target: "test"
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    steps:
+    - name: executing remote ssh commands using password
+      uses: appleboy/ssh-action@master
+      with:
+        host: ec2-18-232-178-255.compute-1.amazonaws.com
+        username: ubuntu
+        key: ${{ secrets.AIRFLOW_PEM }}
+        port: 22
+        script: ./files/run.sh
+      # with:
+      #   host: ${{ secrets.HOST }}
+      #   username: ${{ secrets.USERNAME }}
+      #   password: ${{ secrets.PASSWORD }}
+      #   port: ${{ secrets.PORT }}
+      #   script: whoami
 
 
 # name: develop
