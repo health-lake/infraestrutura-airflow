@@ -1,39 +1,100 @@
-name: develop
-
-on:
-  push:
-    branches:
-      - main
-
+name: scp files
+on: [push]
 jobs:
-  deploy:
+
+  build:
+    name: Build
     runs-on: ubuntu-latest
     steps:
+    - uses: actions/checkout@master
+    - name: copy file via ssh password
+      uses: appleboy/scp-action@master
+      with:
+        host: ec2-18-232-178-255.compute-1.amazonaws.com
+        username: ubuntu
+        key: ${{ secrets.AIRFLOW_PEM }}
+        port: 22
+        source: "docker-compose.yaml,run.sh,config/*"
+        target: "docker-compose.yml,run.sh"
+      # with:
+      #   host: ${{ secrets.HOST }}
+      #   username: ${{ secrets.USERNAME }}
+      #   password: ${{ secrets.PASSWORD }}
+      #   port: ${{ secrets.PORT }}
+      #   source: "tests/a.txt,tests/b.txt"
+      #   target: "test"
+
+
+# name: develop
+
+# on:
+#   push:
+#     branches:
+#       - main
+# jobs:
+#   deploy:
+#     runs-on: ubuntu-latest
+#     steps:
+#     - uses: actions/checkout@v1
+#       env:
+#           AIRFLOW_PEM: ${{ secrets.AIRFLOW_PEM }}
+#           POSTGRESQL_DATABASE: ${{ secrets.POSTGRESQL_DATABASE_DEV }}
+#           POSTGRESQL_USERNAME: ${{ secrets.POSTGRESQL_DATABASE_DEV }}
+#           POSTGRESQL_PASSWORD: ${{ secrets.POSTGRESQL_PASSWORD_DEV }}
+#           AIRFLOW_PASSWORD: ${{ secrets.AIRFLOW_PASSWORD }}
+#           AIRFLOW_USERNAME: ${{ secrets.AIRFLOW_USERNAME }}
+#           AIRFLOW_EMAIL: ${{ secrets.AIRFLOW_EMAIL }}
+#     - name: before_script
+#       run: |
+#         sudo apt-get update
+#         sudo apt-get install gettext-base
+#         eval $(ssh-agent -s)
+#         echo "$AIRFLOW_PEM" | tr -d '\r' | ssh-add -
+#         mkdir -p ~/.ssh
+#         chmod 700 ~/.ssh
+#         envsubst < docker-compose.yaml > docker-compose.yml
+#         scp -o StrictHostKeyChecking=no docker-compose.yml ubuntu@${{ secrets.HOST }}:docker-compose.yaml
+#         ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.HOST }} 'bash -s' < run.sh
+#       env:
+#         AIRFLOW_PEM: ${{ secrets.AIRFLOW_PEM }}
+#         POSTGRESQL_DATABASE: ${{ secrets.POSTGRESQL_DATABASE_DEV }}
+#         POSTGRESQL_USERNAME: ${{ secrets.POSTGRESQL_DATABASE_DEV }}
+#         POSTGRESQL_PASSWORD: ${{ secrets.POSTGRESQL_PASSWORD_DEV }}
+#         AIRFLOW_PASSWORD: ${{ secrets.AIRFLOW_PASSWORD }}
+#         AIRFLOW_USERNAME: ${{ secrets.AIRFLOW_USERNAME }}
+#         AIRFLOW_EMAIL: ${{ secrets.AIRFLOW_EMAIL }}
+
+jobs:
+
+  deploy:
+
+    runs-on: ubuntu-latest
+
+    steps:
     - uses: actions/checkout@v1
+    - name: Check-out the repositories
       env:
-          AIRFLOW_PEM: ${{ secrets.AIRFLOW_PEM }}
-          POSTGRESQL_DATABASE: ${{ secrets.POSTGRESQL_DATABASE_DEV }}
-          POSTGRESQL_USERNAME: ${{ secrets.POSTGRESQL_DATABASE_DEV }}
-          POSTGRESQL_PASSWORD: ${{ secrets.POSTGRESQL_PASSWORD_DEV }}
-          AIRFLOW_PASSWORD: ${{ secrets.AIRFLOW_PASSWORD }}
-          AIRFLOW_USERNAME: ${{ secrets.AIRFLOW_USERNAME }}
-          AIRFLOW_EMAIL: ${{ secrets.AIRFLOW_EMAIL }}
-    - name: before_script
-      run: |
-        sudo apt-get update
-        sudo apt-get install gettext-base
-        eval $(ssh-agent -s)
-        echo "$AIRFLOW_PEM" | tr -d '\r' | ssh-add -
-        mkdir -p ~/.ssh
-        chmod 700 ~/.ssh
-        envsubst < docker-compose.yaml > docker-compose.yml
-        scp -o StrictHostKeyChecking=no docker-compose.yml ubuntu@${{ secrets.HOST }}:docker-compose.yaml
-        ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.HOST }} 'bash -s' < run.sh
-      env:
-        AIRFLOW_PEM: ${{ secrets.AIRFLOW_PEM }}
+        SECRET_SSH_KEY: ${{ secrets.AIRFLOW_PEM }}
         POSTGRESQL_DATABASE: ${{ secrets.POSTGRESQL_DATABASE_DEV }}
         POSTGRESQL_USERNAME: ${{ secrets.POSTGRESQL_DATABASE_DEV }}
         POSTGRESQL_PASSWORD: ${{ secrets.POSTGRESQL_PASSWORD_DEV }}
         AIRFLOW_PASSWORD: ${{ secrets.AIRFLOW_PASSWORD }}
         AIRFLOW_USERNAME: ${{ secrets.AIRFLOW_USERNAME }}
         AIRFLOW_EMAIL: ${{ secrets.AIRFLOW_EMAIL }}
+    - name: before_script
+      run: |
+        sudo mkdir /run/user/$(id -u)
+        sudo chown $(whoami) /run/user/$(id -u)
+        # sudo apt-get install -y --allow-downgrades libllvm6.0=1:6.0-1ubuntu2
+        sudo apt-get install clang-format-6.0
+        sudo apt-get update
+        sudo apt-get install -y coreutils jq
+        echo "$SECRET_SSH_KEY" >secret_ssh_key
+        chmod 700 secret_ssh_key
+        ssh-agent bash -c 'ssh-add secret_ssh_key; git clone git clone https://github.com/health-lake/infraestrutura-airflow'
+        ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.HOST }} 'bash -s' < run.sh
+      #  # only get the whatever is newest in FDIO, to save the waste of b/w for everyone
+      #  (cd vpp; git remote add fdio.origin ssh://test4aiuortch@gerrit.fd.io:29418/vpp)
+      #  ssh-agent bash -c 'ssh-add secret_gerrit_key; cd vpp; GIT_SSH_COMMAND="ssh -o StrictHostKeyChecking=no" git pull fdio.origin master'
+      #  ssh-agent bash -c 'ssh-add secret_ssh_key; git clone git@github.com:vpp-dev/vpp-daily-tweaks.git'
+
