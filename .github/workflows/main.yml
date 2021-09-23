@@ -22,7 +22,7 @@ jobs:
         username: ubuntu
         key: ${{ secrets.AIRFLOW_PEM }}
         port: 22
-        source: "docker-compose.yaml,run.sh,config/*"
+        source: "docker-compose.yaml,run.sh"
         target: "docker-compose.yml,run.sh"
       # with:
       #   host: ${{ secrets.HOST }}
