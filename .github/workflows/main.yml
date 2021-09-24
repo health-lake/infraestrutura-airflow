@@ -45,7 +45,6 @@ jobs:
         key: ${{ secrets.AIRFLOW_PEM }}
         port: 22
         script: |
-          AIRFLOW_PEM=${{ secrets.AIRFLOW_PEM }}
           POSTGRESQL_DATABASE=${{ secrets.POSTGRESQL_DATABASE_DEV }}
           POSTGRESQL_USERNAME=${{ secrets.POSTGRESQL_DATABASE_DEV }}
           POSTGRESQL_PASSWORD=${{ secrets.POSTGRESQL_PASSWORD_DEV }}
