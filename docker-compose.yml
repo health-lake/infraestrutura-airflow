@@ -45,7 +45,7 @@ services:
     restart: always
     image: docker.io/bitnami/airflow-worker:2
     environment:
-       - AIRFLOW_DATABASE_NAME=${POSTGRESQL_DATABASE}
+      - AIRFLOW_DATABASE_NAME=${POSTGRESQL_DATABASE}
       - AIRFLOW_DATABASE_USERNAME=${POSTGRESQL_USERNAME}
       - AIRFLOW_DATABASE_PASSWORD=${POSTGRESQL_PASSWORD}
       - AIRFLOW_EXECUTOR=CeleryExecutor
@@ -74,7 +74,7 @@ services:
       - AIRFLOW__CORE__LOAD_EXAMPLES=False
       - AIRFLOW__CORE__LOAD_MIN_SERIALIZED_DAG_UPDATE_INTERVAL=10
     ports:
-      - '8080:8080'
+      - "8080:8080"
     volumes:
       - airflow_data:/bitnami
       - ./dags:/opt/bitnami/airflow/dags
