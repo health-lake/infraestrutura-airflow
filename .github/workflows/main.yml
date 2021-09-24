@@ -43,9 +43,12 @@ jobs:
         key: ${{ secrets.AIRFLOW_PEM }}
         port: 22
         script: |
+          pwd
           ls
           ls -al
           chmod 700 /home/ubuntu/files/run.sh
+          ls -al
+          ls -R
           ./home/ubuntu/files/run.sh
       # with:
       #   host: ${{ secrets.HOST }}
