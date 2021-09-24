@@ -45,12 +45,12 @@ jobs:
         key: ${{ secrets.AIRFLOW_PEM }}
         port: 22
         script: |
-          export POSTGRESQL_DATABASE="bitnami_airflow"
-          export POSTGRESQL_USERNAME="bn_airflow"
-          export POSTGRESQL_PASSWORD="bitnami1"
-          export AIRFLOW_PASSWORD="airflow"
-          export AIRFLOW_USERNAME="airflow"
-          export AIRFLOW_EMAIL="airflow@healthlake.com"
+          sudo export POSTGRESQL_DATABASE="bitnami_airflow"
+          sudo export POSTGRESQL_USERNAME="bn_airflow"
+          sudo export POSTGRESQL_PASSWORD="bitnami1"
+          sudo export AIRFLOW_PASSWORD="airflow"
+          sudo export AIRFLOW_USERNAME="airflow"
+          sudo export AIRFLOW_EMAIL=${{ secrets.AIRFLOW_EMAIL }}
           cd files/
           chmod 700 run.sh
           sudo docker-compose down
