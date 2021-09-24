@@ -47,6 +47,7 @@ jobs:
         script: |
           cd files/
           chmod 700 run.sh
+          sudo docker-compose down
           ./run.sh
       # with:
       #   host: ${{ secrets.HOST }}
