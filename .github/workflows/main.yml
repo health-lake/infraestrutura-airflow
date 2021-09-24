@@ -45,10 +45,7 @@ jobs:
         key: ${{ secrets.AIRFLOW_PEM }}
         port: 22
         script: |
-          pwd
-          ls files/
-          chmod 700 /files/run.sh
-          ls -al files/
+          chown files/run.sh
           ./files/run.sh
       # with:
       #   host: ${{ secrets.HOST }}
