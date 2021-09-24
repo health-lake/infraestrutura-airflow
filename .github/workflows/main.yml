@@ -46,12 +46,10 @@ jobs:
         port: 22
         script: |
           pwd
-          ls
-          ls -al
-          chmod 700 /home/ubuntu/files/run.sh
-          ls -al
-          ls -R
-          ./home/ubuntu/files/run.sh
+          ls files/
+          chmod 700 /files/run.sh
+          ls -al files/
+          ./files/run.sh
       # with:
       #   host: ${{ secrets.HOST }}
       #   username: ${{ secrets.USERNAME }}
