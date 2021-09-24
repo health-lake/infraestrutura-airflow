@@ -1,0 +1,93 @@
+version: '2'
+
+services:
+  postgresql:
+    image: docker.io/bitnami/postgresql:10
+    volumes:
+      - 'postgresql_data:/bitnami/postgresql'
+    environment:
+      - POSTGRESQL_DATABASE=${POSTGRESQL_DATABASE}
+      - POSTGRESQL_USERNAME=${POSTGRESQL_USERNAME}
+      - POSTGRESQL_PASSWORD=${POSTGRESQL_PASSWORD}
+      # ALLOW_EMPTY_PASSWORD is recommended only for development.
+      - ALLOW_EMPTY_PASSWORD=yes
+
+  redis:
+    image: docker.io/bitnami/redis:6.0
+    volumes:
+      - 'redis_data:/bitnami'
+    environment:
+      # ALLOW_EMPTY_PASSWORD is recommended only for development.
+      - ALLOW_EMPTY_PASSWORD=yes
+
+  airflow-scheduler:
+    # TODO: to be reverted to use proper registry/distro on T39132
+    # image: docker.io/bitnami/airflow-scheduler:2
+    restart: always
+    image: docker.io/bitnami/airflow-scheduler:2
+    environment:
+      - AIRFLOW_DATABASE_NAME=${POSTGRESQL_DATABASE}
+      - AIRFLOW_DATABASE_USERNAME=${POSTGRESQL_USERNAME}
+      - AIRFLOW_DATABASE_PASSWORD=${POSTGRESQL_PASSWORD}
+      - AIRFLOW_EXECUTOR=CeleryExecutor
+      - AIRFLOW_WEBSERVER_HOST=airflow
+      - AIRFLOW__SCHEDULER__DAG_DIR_LIST_INTERVAL=10
+      - AIRFLOW__CORE__LOAD_EXAMPLES=False
+      - AIRFLOW__CORE__LOAD_MIN_SERIALIZED_DAG_UPDATE_INTERVAL=10
+    volumes:
+      - airflow_scheduler_data:/bitnami
+      - ./dags:/opt/bitnami/airflow/dags
+      - ./packages:/bitnami/python
+
+  airflow-worker:
+    # TODO: to be reverted to use proper registry/distro on T39132
+    # image: docker.io/bitnami/airflow-worker:2
+    restart: always
+    image: docker.io/bitnami/airflow-worker:2
+    environment:
+       - AIRFLOW_DATABASE_NAME=${POSTGRESQL_DATABASE}
+      - AIRFLOW_DATABASE_USERNAME=${POSTGRESQL_USERNAME}
+      - AIRFLOW_DATABASE_PASSWORD=${POSTGRESQL_PASSWORD}
+      - AIRFLOW_EXECUTOR=CeleryExecutor
+      - AIRFLOW_WEBSERVER_HOST=airflow
+      - AIRFLOW__SCHEDULER__DAG_DIR_LIST_INTERVAL=10
+      - AIRFLOW__CORE__LOAD_EXAMPLES=False
+      - AIRFLOW__CORE__LOAD_MIN_SERIALIZED_DAG_UPDATE_INTERVAL=10
+    volumes:
+      - airflow_worker_data:/bitnami
+      - ./dags:/opt/bitnami/airflow/dags
+      - ./packages:/bitnami/python
+
+  airflow:
+    restart: always
+    image: docker.io/bitnami/airflow:2
+    environment:
+      - AIRFLOW_PASSWORD=${AIRFLOW_PASSWORD}
+      - AIRFLOW_USERNAME=${AIRFLOW_USERNAME}
+      - AIRFLOW_EMAIL=${AIRFLOW_EMAIL}
+      - AIRFLOW_DATABASE_NAME=${POSTGRESQL_DATABASE}
+      - AIRFLOW_DATABASE_USERNAME=${POSTGRESQL_USERNAME}
+      - AIRFLOW_DATABASE_PASSWORD=${POSTGRESQL_PASSWORD}
+      - AIRFLOW_EXECUTOR=CeleryExecutor
+      - AIRFLOW_WEBSERVER_HOST=airflow
+      - AIRFLOW__SCHEDULER__DAG_DIR_LIST_INTERVAL=10
+      - AIRFLOW__CORE__LOAD_EXAMPLES=False
+      - AIRFLOW__CORE__LOAD_MIN_SERIALIZED_DAG_UPDATE_INTERVAL=10
+    ports:
+      - '8080:8080'
+    volumes:
+      - airflow_data:/bitnami
+      - ./dags:/opt/bitnami/airflow/dags
+      - ./packages:/bitnami/python
+
+volumes:
+  airflow_scheduler_data:
+    driver: local
+  airflow_worker_data:
+    driver: local
+  airflow_data:
+    driver: local
+  postgresql_data:
+    driver: local
+  redis_data:
+    driver: local
