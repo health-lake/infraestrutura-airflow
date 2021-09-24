@@ -45,12 +45,12 @@ jobs:
         key: ${{ secrets.AIRFLOW_PEM }}
         port: 22
         script: |
-          export POSTGRESQL_DATABASE="${{ secrets.POSTGRESQL_DATABASE_DEV }}"
-          export POSTGRESQL_USERNAME="${{ secrets.POSTGRESQL_DATABASE_DEV }}"
-          export POSTGRESQL_PASSWORD="${{ secrets.POSTGRESQL_PASSWORD_DEV }}"
-          export AIRFLOW_PASSWORD="${{ secrets.AIRFLOW_PASSWORD }}"
-          export AIRFLOW_USERNAME="${{ secrets.AIRFLOW_USERNAME }}"
-          export AIRFLOW_EMAIL="${{ secrets.AIRFLOW_EMAIL }}"
+          export POSTGRESQL_DATABASE="$POSTGRESQL_DATABASE"
+          export POSTGRESQL_USERNAME="$POSTGRESQL_USERNAME"
+          export POSTGRESQL_PASSWORD="$POSTGRESQL_PASSWORD
+          export AIRFLOW_PASSWORD="$AIRFLOW_PASSWORD"
+          export AIRFLOW_USERNAME="$AIRFLOW_USERNAME"
+          export AIRFLOW_EMAIL="$AIRFLOW_EMAIL"
           cd files/
           chmod 700 run.sh
           sudo docker-compose down
