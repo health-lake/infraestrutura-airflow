@@ -35,14 +35,18 @@ jobs:
     name: Deploy
     runs-on: ubuntu-latest
     steps:
-    - name: executing remote ssh commands using password
+    - name: executing remote ssh commands
       uses: appleboy/ssh-action@master
       with:
         host: ec2-18-232-178-255.compute-1.amazonaws.com
         username: ubuntu
         key: ${{ secrets.AIRFLOW_PEM }}
         port: 22
-        script: ./files/run.sh
+        script: |
+          ls
+          ls -al
+          chmod 700 /home/ubuntu/files/run.sh
+          ./home/ubuntu/files/run.sh
       # with:
       #   host: ${{ secrets.HOST }}
       #   username: ${{ secrets.USERNAME }}
